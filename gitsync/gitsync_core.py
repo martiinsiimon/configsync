@@ -50,21 +50,6 @@ class GitSyncCore:
         self.config = _config
 
 
-    #def initialize(self):#FIXME deprecated
-    #   """First time configured GitSync has to be initialized"""
-    #    #self.config.restoreConfiguration()
-    #    if not os.path.isdir(self.config.data.path):
-    #        os.mkdir(self.config.data.path)
-    #    else:
-    #        if os.path.isdir(self.config.data.path + '.git'):
-    #            shutil.rmtree(self.config.data.path + '.git')
-    #
-    #        self.gitClone()
-    #        #TODO update file list from the remote files
-
-    #    self.config.data.synced = True
-    #    self.config.storeConfiguration()
-
     def createWorkingDirectory(self, _path):
         """
         Creates working directory or returns False
@@ -76,16 +61,6 @@ class GitSyncCore:
             return True
         except:
             return False
-
-    #def gitClone(self): #OBSOLETE
-    #    """
-    #    Clone given repo into the directory
-    #    """
-    #    link = self.config.data.repo
-    #    path = self.config.data.path
-    #    cmd = ['git', 'clone', link, path]
-    #    p = subprocess.Popen(cmd)
-    #    p.wait()
 
     def gitClone(self, _path, _repo):
         """
@@ -143,7 +118,9 @@ class GitSyncCore:
         #FIXME the output should be parsed and checked for errors
 
     def gitPush(self):
-        """Git push command"""
+        """
+        Git push command
+        """
         _path = self.config.data.path
         cmd = ['git', 'push', '-u', 'origin', 'master'] #TODO is this correct?
         #p = subprocess.Popen(cmd, pwd = _path)
@@ -178,15 +155,11 @@ class GitSyncCore:
         p.wait()
 
     def synchronize(self):
-        """Do the synchronization itself."""
-        #TODO synchronize only existing files on both systems
-        #TODO synchronize only changed files
-        #TODO handle copying
+        """
+        Do the synchronization itself.
+        """
+        #TODO synchronize
         pass
 
-    def daemonize(self):
-        """Transform to a daemon. Note: FutureFeature"""
-        #TODO
-        pass
 
 
