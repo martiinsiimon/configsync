@@ -4,7 +4,7 @@
 """
 Author:         Martin Simon
 Email:          martiin.siimon@gmail.com
-Git:            http://bitbucket.org/martiinsiimon/gitsync
+Git:            https://github.com/martiinsiimon/gitsync
 License:        See bellow
 Project info:   GitSync is an easy tool to maintain small files synchronization
                 over remote git repository. It's not supposed to synchronize
@@ -17,25 +17,24 @@ File info:      This file describes the graphical interface and all the signal
 
 The MIT License (MIT)
 
-Copyright (c) 2013 Martin Simon <martiin.siimon@gmail.com>
+Copyright (c) 2013 Martin Simon
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from gi.repository import Gtk, GObject
@@ -64,7 +63,7 @@ class GitSyncGui:
 
         self.config = GitSyncConfig()
         self.core = GitSyncCore(self.config)
-        
+
         if not self.config.data.synced:
         #if False: #if the wizard should be started
             """Not yet initialized"""
@@ -84,7 +83,7 @@ class GitSyncGui:
             self.filesTreeview.append_column(column2)
             self.filesTreeview.append_column(column3)
             self.filesTreeview.expand_all()
-        
+
         self.window.show()
 
     def show_wizard(self):
@@ -100,45 +99,45 @@ class GitSyncGui:
         valid = True # set to False if any check fails
         #TODO check if the given address is address to repo
         #TODO check if user have correct permissions to the repo
-        
+
         if valid and not self.core.createWorkingDirectory(directory):
             print('DBG: Unable to create working directory!')
             #TODO add visible warning
-        
+
         if valid and not self.core.gitClone(repository, directory):
             print('DBG: Unable to clone repository!')
             #TODO add visible warning and possible more options (key, password, etc.)
-        
+
         if valid:
             self.config.data.name = self.builder.get_object('nameSummary').get_text()
             self.config.data.repo = repository
             self.config.data.path = directory
             self.config.storeConfiguration()
-            
+
             self.config.restoreFileList()
             #self.core.gitAdd(self.config.filesFile)
-            
+
         else:
             print('DBG: Any error occured before, configuration hasn\'t been stored')
             #TODO add visible warning
-        
+
         self.wizard.hide()
         self.show_main_window()
 
     def on_wizard_next_clicked(self, object, data=None):
         ntb = self.builder.get_object('wizardNotebook')
         ntb.next_page()
-        
+
     def on_wizardNotebook_switch_page(self, object, data=None, tab=None):
         if tab == 4:
             self.refresh_summary_forms()
-        
+
     def refresh_summary_forms(self):
         print('DBG: Refresh summary forms')
         self.builder.get_object('nameSummary').set_text(self.builder.get_object('nameEntry').get_text())
         self.builder.get_object('directorySummary').set_text(self.builder.get_object('directoryEntry').get_text())
         self.builder.get_object('repoSummary').set_text(self.builder.get_object('repoEntry').get_text())
-        
+
     def on_wizard_back_clicked(self, object, data=None):
         ntb = self.builder.get_object('wizardNotebook')
         ntb.prev_page()
@@ -172,7 +171,7 @@ class GitSyncGui:
             self.config.storeConfiguration()
             #TODO Git add na file list
             self.core.gitAdd(f)
-            
+
             #TODO git commit and git push?
 
             self.updateFileList()
@@ -199,9 +198,9 @@ class GitSyncGui:
                 self.config.files.delFile(f)
             self.config.storeConfiguration()
             self.config.storeFileList()
-            
+
             self.updateFileList()
-            
+
         dialog.hide()
 
     def on_syncButton_clicked(self, object, data=None):
@@ -238,7 +237,7 @@ class GitSyncGui:
                 if self.config.data.existsFile(f):
                     l = self.config.data.getValue(f)
                 self.filesListstore.append([f,l,o])
-        
+
         self.filesTreeview.set_model(self.filesListstore)
         self.filesTreeview.expand_all()
 

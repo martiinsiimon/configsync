@@ -4,7 +4,7 @@
 """
 Author:         Martin Simon
 Email:          martiin.siimon@gmail.com
-Git:            http://bitbucket.org/martiinsiimon/gitsync
+Git:            https://github.com/martiinsiimon/gitsync
 License:        See bellow
 Project info:   GitSync is an easy tool to maintain small files synchronization
                 over remote git repository. It's not supposed to synchronize
@@ -17,25 +17,24 @@ File info:      This file contains the core of GitSync synchronization. It
 
 The MIT License (MIT)
 
-Copyright (c) 2013 Martin Simon <martiin.siimon@gmail.com>
+Copyright (c) 2013 Martin Simon
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from gitsync_config import GitSyncConfig
@@ -59,13 +58,13 @@ class GitSyncCore:
     #    else:
     #        if os.path.isdir(self.config.data.path + '.git'):
     #            shutil.rmtree(self.config.data.path + '.git')
-    #        
+    #
     #        self.gitClone()
     #        #TODO update file list from the remote files
 
     #    self.config.data.synced = True
     #    self.config.storeConfiguration()
-        
+
     def createWorkingDirectory(self, _path):
         """
         Creates working directory or returns False
@@ -87,7 +86,7 @@ class GitSyncCore:
     #    cmd = ['git', 'clone', link, path]
     #    p = subprocess.Popen(cmd)
     #    p.wait()
-        
+
     def gitClone(self, _path, _repo):
         """
         Clone given repo into the directory
@@ -122,7 +121,7 @@ class GitSyncCore:
         #p = subprocess.Popen(cmd, pwd = _path)
         #p.wait()
         #FIXME the output should be parsed and checked for errors
-        
+
     def gitRemove(self,f):
         """
         Remove a file. Execute: git remove
@@ -132,7 +131,7 @@ class GitSyncCore:
         #p = subprocess.Popen(cmd, pwd = _path)
         #p.wait()
         #FIXME the output should be parsed and checked for errors
-        
+
     def gitPull(self):
         """
         Git pull command
@@ -142,7 +141,7 @@ class GitSyncCore:
         #p = subprocess.Popen(cmd, pwd = _path)
         #p.wait()
         #FIXME the output should be parsed and checked for errors
-        
+
     def gitPush(self):
         """Git push command"""
         _path = self.config.data.path
@@ -160,7 +159,7 @@ class GitSyncCore:
         cmd = ['ln', f, target] #FIXME substitute with python native call
         p = subprocess.Popen(cmd)
         p.wait()
-        
+
     def unlinkFile(self, f):
         """
         Split a hardlink connection between two files to make them independent
@@ -169,11 +168,11 @@ class GitSyncCore:
         cmd = ['mv', target, "/tmp/tmpname"] #FIXME substitute with python native call
         p = subprocess.Popen(cmd)
         p.wait()
-        
+
         cmd = ['cp', '/tmp/tmpname', target] #FIXME substitute with python native call
         p = subprocess.Popen(cmd)
         p.wait()
-        
+
         cmd = ['rm', '/tmp/tmpname'] #FIXME substitute with python native call
         p = subprocess.Popen(cmd)
         p.wait()
