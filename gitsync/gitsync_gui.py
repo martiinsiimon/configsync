@@ -65,7 +65,6 @@ class GitSyncGui:
         self.core = GitSyncCore(self.config)
 
         if not self.config.data.synced:
-        #if False: #if the wizard should be started
             """Not yet initialized"""
             self.show_wizard()
         else:
@@ -102,7 +101,7 @@ class GitSyncGui:
 
         if valid and not self.core.createWorkingDirectory(directory):
             print('DBG: Unable to create working directory!')
-            #TODO add visible warning
+            #TODO add visible warning and return to the appropriate wizard page
 
         if valid and not self.core.gitClone(repository, directory):
             print('DBG: Unable to clone repository!')
@@ -115,7 +114,6 @@ class GitSyncGui:
             self.config.storeConfiguration()
 
             self.config.restoreFileList()
-            #self.core.gitAdd(self.config.filesFile)
 
         else:
             print('DBG: Any error occured before, configuration hasn\'t been stored')
@@ -150,9 +148,6 @@ class GitSyncGui:
 
     def on_addFileButton_clicked(self, object, data=None):
         print("addFileButton clicked")
-        if not self.config.data.synced:
-            self.notifyStrong("Please, store the configuration before adding any file to eliminate merge conflicts")
-            return
 
         dialog = self.builder.get_object('fileChooseDialog')
         response = dialog.run()
@@ -175,10 +170,10 @@ class GitSyncGui:
             #TODO git commit and git push?
 
             self.updateFileList()
-            dialog.hide()
+        dialog.hide()
 
     def on_removeFileButton_clicked(self, object, data=None):
-        print("removeFileButton clicked")
+        print("DBG: removeFileButton clicked")
         model, treeiter = self.filesTreeview.get_selection().get_selected()
         if treeiter == None:
             self.notifyStrong('You haven\'t selected any file to remove!')
@@ -196,6 +191,28 @@ class GitSyncGui:
             if self.config.files.delFileLink(f):
                 self.core.gitRemove(f)
                 self.config.files.delFile(f)
+            self.config.storeConfiguration()
+            self.config.storeFileList()
+
+            self.updateFileList()
+
+        dialog.hide()
+
+    def on_linkFileButton_clicked(self, object, data=None):
+        print("DBG: linkFileButton clicked")
+        model, treeiter = self.filesTreeview.get_selection().get_selected()
+        if treeiter == None:
+            self.notifyStrong('You haven\'t selected any file to link!')
+            return
+        dialog = self.builder.get_object('fileChooseDialog')
+        response = dialog.run()
+        big = False
+        if response == 1:
+            s = dialog.get_filename()
+            f = model[treeiter][0]
+            self.config.data.addFile(f,s)
+            self.config.files.addFileLink(f)
+
             self.config.storeConfiguration()
             self.config.storeFileList()
 

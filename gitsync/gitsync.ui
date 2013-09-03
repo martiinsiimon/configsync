@@ -255,11 +255,12 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="linkFile">
+                  <object class="GtkButton" id="linkFileButton">
                     <property name="label" translatable="yes">Link file</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="on_linkFileButton_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
