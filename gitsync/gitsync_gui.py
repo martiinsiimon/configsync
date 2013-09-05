@@ -167,7 +167,8 @@ class GitSyncGui:
 
             self.config.data.addFile(f,f)
             self.config.files.addFile(f, self.config.data.name)
-            self.core.linkFile(f)
+            s = self.config.data.path +"/"+ os.path.basename(f)
+            self.core.linkFile(f, s)
             self.config.storeFileList()
             self.config.storeConfiguration()
             #TODO Git add na file list
@@ -184,16 +185,23 @@ class GitSyncGui:
         if treeiter == None:
             self.notifyStrong('You haven\'t selected any file to remove!')
             return
-
-        dialog = self.builder.get_object('questionRemoveFileDialog')
+        
         f = model[treeiter][0]
         s = model[treeiter][1]
+        
+        if not self.config.data.existsFile(f):
+            self.notifyStrong('The selected file is not synced!')
+            return
+
+        dialog = self.builder.get_object('questionRemoveFileDialog')
+        
         self.builder.get_object('fileLabel').set_text(f)
         response = dialog.run()
 
         if response == 1:
             self.config.data.delFile(f)
-            self.core.unlinkFile(f)
+            syncedFile = self.config.data.path + "/" + os.path.basename(f)
+            self.core.unlinkFile(syncedFile)
             if self.config.files.delFileLink(f):
                 self.core.gitRemove(f)
                 self.config.files.delFile(f)
@@ -217,6 +225,7 @@ class GitSyncGui:
             s = dialog.get_filename()
             f = model[treeiter][0]
             self.config.data.addFile(f,s)
+            self.core.linkFile(f, s)
             self.config.files.addFileLink(f)
 
             self.config.storeConfiguration()

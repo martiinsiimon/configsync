@@ -127,26 +127,25 @@ class GitSyncCore:
         #p.wait()
         #FIXME the output should be parsed and checked for errors
 
-    def linkFile(self, f):
+    def linkFile(self, f, s):
         """
         Make a hardlink to the file to synchronize to gitsync working
         directory to begin synchronization
         """
-        target = self.config.data.path +"/"+ os.path.basename(f)
-        cmd = ['ln', f, target] #FIXME substitute with python native call
+        cmd = ['ln', '-f', f, s] #FIXME substitute with python native call
         p = subprocess.Popen(cmd)
         p.wait()
 
-    def unlinkFile(self, f):
+    def unlinkFile(self, remoteFile):
         """
         Split a hardlink connection between two files to make them independent
         """
-        target = self.config.data.path +"/"+ os.path.basename(f)
-        cmd = ['mv', target, "/tmp/tmpname"] #FIXME substitute with python native call
+        #target = self.config.data.path +"/"+ os.path.basename(f)
+        cmd = ['mv', remoteFile, "/tmp/tmpname"] #FIXME substitute with python native call
         p = subprocess.Popen(cmd)
         p.wait()
 
-        cmd = ['cp', '/tmp/tmpname', target] #FIXME substitute with python native call
+        cmd = ['cp', '/tmp/tmpname', remoteFile] #FIXME substitute with python native call
         p = subprocess.Popen(cmd)
         p.wait()
 
