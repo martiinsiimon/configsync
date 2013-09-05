@@ -1,15 +1,21 @@
-GitSync - synchronization over git
-==================================
-Author:         Martin Simon
-Email:          martiin.siimon@gmail.com
-Git:            http://bitbucket.org/martiinsiimon/gitsync
-License:        See the LICENSE file
-Project info:   GitSync is an easy tool to maintain small files synchronization
-                over remote git repository. It's not supposed to synchronize
-                big files. To such files use services as DropBox or SpiderOak.
-                The main purpose is to synchronize config files among very
-                similar systems to keep them sycnhronized and as much same
-                as possible.
+# GitSync #
 
-What's not the purpose:
+GitSync is a tool with purpose to easy synchronize system config files over git.
+It uses git repository because of its availability and easy way how to track file
+changes and origins.
+
+## Author ##
+Martin Simon <martiin.siimon@gmail.com>
+
+## Repository ##
+http://github.com/martiinsiimon/gitsync
+
+## License ##
+This software is licensed under MIT license.
+
+## What's the goal? ##
+The main purpose is to synchronize config files among very
+similar systems to keep them sycnhronized and as much same as possible.
+
+## What's not the goal? ##
  * Synchronize big files
