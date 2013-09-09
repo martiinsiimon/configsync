@@ -108,8 +108,8 @@ class GitSyncConfig:
 
     def setConfigDefaults(self):
         self.data.name = 'My Synchronized Machine'
-        self.data.path = '/home/martin/.gitsync/'
-        self.data.repo = 'ssh://git@bitbucket.org/martiinsiimon/synchronization.git'
+        self.data.path = '~/.gitsync/'
+        self.data.repo = 'ssh://git@gitserver.tld/user_name/repo.git'
         self.data.synced = False
 
     def restoreFileList(self):
