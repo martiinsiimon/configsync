@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# gitsync documentation build configuration file, created by
+# configsync documentation build configuration file, created by
 # sphinx-quickstart on Tue Sep  3 23:37:52 2013.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -41,7 +41,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'gitsync'
+project = 'configsync'
 copyright = '2013, Martin Simon'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -165,7 +165,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'gitsyncdoc'
+htmlhelp_basename = 'syncdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -184,7 +184,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'gitsync.tex', 'gitsync Documentation',
+  ('index', 'configsync.tex', 'configsync Documentation',
    'Author', 'manual'),
 ]
 
@@ -214,7 +214,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'gitsync', 'gitsync Documentation',
+    ('index', 'configsync', 'configsync Documentation',
      ['Author'], 1)
 ]
 
@@ -228,9 +228,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'gitsync', 'gitsync Documentation',
-   'Author', 'gitsync', 'One line description of project.',
-   'Miscellaneous'),
+  ('index', 'configsync', 'ConfigSync Documentation',
+   'Martin Simon', 'configsync', 'ConfigSync is a tool with purpose to easy synchronize system config files over remote storage - git.',
+   'Synchornization'),
 ]
 
 # Documents to append as an appendix to all manuals.
@@ -246,10 +246,10 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'gitsync'
-epub_author = 'Author'
-epub_publisher = 'Author'
-epub_copyright = '2013, Author'
+epub_title = 'ConfigSync'
+epub_author = 'Martin Simon'
+epub_publisher = 'Martin Simon'
+epub_copyright = '2013, Martin Simon'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
