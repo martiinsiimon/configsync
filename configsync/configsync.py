@@ -4,15 +4,14 @@
 """
 Author:         Martin Simon
 Email:          martiin.siimon@gmail.com
-Git:            https://github.com/martiinsiimon/gitsync
+Git:            https://github.com/martiinsiimon/configsync
 License:        See bellow
-Project info:   GitSync is an easy tool to maintain small files synchronization
-                over remote git repository. It's not supposed to synchronize
-                big files. To such files use services as DropBox or SpiderOak.
-                The main purpose is to synchronize config files among very
-                similar systems to keep them sycnhronized and as much same
-                as possible.
-File info:      This is the main file, executive one. Using this file GitSync
+Project info:   ConfigSync is a tool with purpose to easy synchronize system config files
+                over remote storage - git. It uses git repository because of its
+                availability and easy way how to track file changes and origins. The main
+                purpose is to synchronize config files among very similar systems to keep
+                them sycnhronized and as much same as possible.
+File info:      This is the main file, executive one. Using this file ConfigSync
                 is started into the GUI as well as into the CLI variant.
 
 The MIT License (MIT)
@@ -37,9 +36,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from gitsync_gui import GitSyncGui
-from gitsync_config import GitSyncConfig
-from gitsync_core import GitSyncCore
+from configsync_gui import ConfigSyncGui
+from configsync_config import ConfigSyncConfig
+from configsync_core import ConfigSyncCore
 from gi.repository import Gtk, GObject, Gdk
 import argparse
 import sys
@@ -47,7 +46,7 @@ import os
 
 
 def printConfiguration():
-    config = GitSyncConfig()
+    config = ConfigSyncConfig()
     print("Machine name [name]:\t", config.data.name)
     print("Repository [repo]:\t", config.data.repo)
     print("Working path [path]:\t", config.data.path)
@@ -56,7 +55,7 @@ def printConfiguration():
         print("\t",f)
 
 def setConfiguration(key,val):
-    config = GitSyncConfig()
+    config = ConfigSyncConfig()
     if key == "name":
         config.data.name = val
     elif key == "repo":
@@ -71,13 +70,14 @@ def setConfiguration(key,val):
     config.storeConfiguration()
 
     if not config.data.synced:
-        gsc = GitSyncCore()
+        gsc = ConfigSyncCore()
         gsc.initialize()
 
 def addFile(f):
-    config = GitSyncConfig()
+    #FIXME update this function
+    config = ConfigSyncConfig()
     if not config.data.synced:
-        gsc = GitSyncCore()
+        gsc = ConfigSyncCore()
         gsc.initialize()
 
     if os.path.isfile(f):
@@ -87,23 +87,25 @@ def addFile(f):
         print("Your requested file does not exists!") #TODO is this problem?
 
 def removeFile(f):
-    config = GitSyncConfig()
+    #FIXME update this function
+    config = ConfigSyncConfig()
     if not config.data.synced:
-        gsc = GitSyncCore()
+        gsc = ConfigSyncCore()
         gsc.initialize()
 
     config.data.delFile(f)
     config.storeConfiguration()
 
 if __name__ == "__main__":
-    params = argparse.ArgumentParser("./gitsync.py", description = "GitSync - synchronization over git")
+    params = argparse.ArgumentParser("./configsync.py", description = "ConfigSync - synchronize system config files")
     group = params.add_mutually_exclusive_group()
     group.add_argument("-s", "--synchronize", action = "store_true", dest = "par_sync", required = False, help = "Synchronize now")
     group.add_argument("-l", "--list", action = "store_true", dest = "par_list", required = False, help = "Show configuration")
     group.add_argument("-c", "--config", nargs = 2, type = str, metavar = ("KEY","VALUE"),dest = "par_conf", required = False, help = "Set a new value")
     group.add_argument("-a", "--add", action = "store", dest = "par_add", required = False, help = "Add a file to synchronize")
     group.add_argument("-r", "--remove", action = "store", dest = "par_remove", required = False, help = "Remove a file from synchronization")
-    #TODO wizard?
+    group.add_argument("-w", "--wizard", action = "store_true", dest = "par_wizard", required = False, help = "Start graphical wizard")
+    #TODO CLI wizard?
 
     try:
         args = params.parse_args()
@@ -121,7 +123,7 @@ if __name__ == "__main__":
             setConfiguration(args.par_conf[0], args.par_conf[1])
 
         elif args.par_sync:
-            gsc = GitSyncCore()
+            gsc = ConfigSyncCore()
             gsc.synchronize()
 
         elif args.par_add != None:
@@ -133,7 +135,10 @@ if __name__ == "__main__":
     else:
         """The GUI variant will be started"""
         GObject.threads_init()
-        main = GitSyncGui()
+        if args.par_wizard:
+            main = ConfigSyncGui(wizard = True)
+        else:
+            main = ConfigSyncGui()
         Gdk.threads_init()
 
         Gdk.threads_enter()

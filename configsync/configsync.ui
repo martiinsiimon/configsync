@@ -63,7 +63,7 @@
   </object>
   <object class="GtkWindow" id="mainWindow">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">GitSync - Synchronization over Git</property>
+    <property name="title" translatable="yes">ConfigSync - synchronize system config files</property>
     <property name="window_position">center</property>
     <property name="default_width">550</property>
     <property name="default_height">400</property>
@@ -270,11 +270,10 @@
                 </child>
                 <child>
                   <object class="GtkButton" id="removeFileButton">
-                    <property name="label">gtk-remove</property>
+                    <property name="label">Unlink file</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="use_stock">True</property>
                     <signal name="clicked" handler="on_removeFileButton_clicked" swapped="no"/>
                   </object>
                   <packing>
@@ -565,7 +564,7 @@
   </object>
   <object class="GtkWindow" id="wizardWindow">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">GitSync Configuration Wizard</property>
+    <property name="title" translatable="yes">ConfigSync Configuration Wizard</property>
     <property name="window_position">center</property>
     <property name="default_width">500</property>
     <property name="default_height">200</property>
@@ -592,7 +591,7 @@
                   <object class="GtkLabel" id="label20">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;Welcome to GitSync wizard!&lt;/big&gt;&lt;/b&gt;</property>
+                    <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;Welcome to ConfigSync wizard!&lt;/big&gt;&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
                   <packing>
@@ -606,7 +605,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="xalign">0</property>
-                    <property name="label" translatable="yes">This wizard appeared because its wheter a first start or some error appeared in recent configuration. Please, provide some information to set-up GitSync.</property>
+                    <property name="label" translatable="yes">This wizard appeared because its wheter a first start or some error appeared in recent configuration. Please, provide some information to set-up ConfigSync.</property>
                     <property name="use_markup">True</property>
                     <property name="wrap">True</property>
                   </object>
@@ -887,7 +886,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="xalign">0</property>
-                    <property name="label" translatable="yes">Please, enter a path to GitSync working directory.
+                    <property name="label" translatable="yes">Please, enter a path to ConfigSync working directory.
 The working directory is used to store files which should be synchronized remotely.
 &lt;b&gt;Note:&lt;/b&gt; If the directory exists, it will be deleted and re-created!</property>
                     <property name="use_markup">True</property>
@@ -1027,7 +1026,7 @@ The working directory is used to store files which should be synchronized remote
                   <object class="GtkEntry" id="repoEntry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="text" translatable="yes">ssh://git@bitbucket.org/martiinsiimon/synchronization.git</property>
+                    <property name="text" translatable="yes"></property>
                   </object>
                   <packing>
                     <property name="expand">False</property>

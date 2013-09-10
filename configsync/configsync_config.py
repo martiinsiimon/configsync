@@ -4,16 +4,15 @@
 """
 Author:         Martin Simon
 Email:          martiin.siimon@gmail.com
-Git:            https://github.com/martiinsiimon/gitsync
+Git:            https://github.com/martiinsiimon/configsync
 License:        See bellow
-Project info:   GitSync is an easy tool to maintain small files synchronization
-                over remote git repository. It's not supposed to synchronize
-                big files. To such files use services as DropBox or SpiderOak.
-                The main purpose is to synchronize config files among very
-                similar systems to keep them sycnhronized and as much same
-                as possible.
+Project info:   ConfigSync is a tool with purpose to easy synchronize system config files
+                over remote storage - git. It uses git repository because of its
+                availability and easy way how to track file changes and origins. The main
+                purpose is to synchronize config files among very similar systems to keep
+                them sycnhronized and as much same as possible.
 File info:      This file contains objects to manipulate, execute and resolve
-                the GitSync configuration.
+                the ConfigSync configuration.
 
 The MIT License (MIT)
 
@@ -40,7 +39,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import pickle
 import os
 
-class GitSyncConfigContainer:
+class ConfigSyncConfigContainer:
     def __init__(self):
         self.name = ''
         self.path = ''
@@ -62,7 +61,7 @@ class GitSyncConfigContainer:
         return self.files[_file]
 
 
-class GitSyncFilesContainer:
+class ConfigSyncFilesContainer:
     """
     Container of file list. This file list is synchornized.
     The file list consists from trio - file name, file original owner, count of linked sides
@@ -85,7 +84,7 @@ class GitSyncFilesContainer:
         if self.existsFile(_file):
             cnt = self.files[_file][1]
             if cnt == 1:
-                return True #TODO do git remove and remove the file from repository
+                return True
             elif cnt > 1:
                 self.files[_file][1] = cnt - 1
                 return False
@@ -97,18 +96,18 @@ class GitSyncFilesContainer:
 
 
 
-class GitSyncConfig:
+class ConfigSyncConfig:
     def __init__(self):
-        self.confFile = '.gitsync.config'
+        self.confFile = '.config'
         self.filesFile = ''
-        self.data = GitSyncConfigContainer()
-        self.files = GitSyncFilesContainer()
+        self.data = ConfigSyncConfigContainer()
+        self.files = ConfigSyncFilesContainer()
         self.restoreConfiguration()
         self.restoreFileList()
 
     def setConfigDefaults(self):
         self.data.name = 'My Synchronized Machine'
-        self.data.path = '~/.gitsync/'
+        self.data.path = '~/.configsync/'
         self.data.repo = 'ssh://git@gitserver.tld/user_name/repo.git'
         self.data.synced = False
 
@@ -116,7 +115,7 @@ class GitSyncConfig:
         """
         Restore file list from remote directory
         """
-        print("DBG: filelist restored")
+        #print("DBG: filelist restored")
         self.filesFile = self.data.path + "/.files"
         if os.path.exists(self.filesFile):
             f = open(self.filesFile,"rb")
@@ -137,7 +136,7 @@ class GitSyncConfig:
         """
         Restore stored configuration
         """
-        print("DBG: configuration restored")
+        #print("DBG: configuration restored")
 
         if os.path.exists(self.confFile):
             f = open(self.confFile,"rb")
@@ -151,7 +150,7 @@ class GitSyncConfig:
         """
         Store configuration into file to make them persistent
         """
-        print("DBG: configuration stored")
+        #print("DBG: configuration stored")
         self.data.synced = True
         f = open(self.confFile, "wb+")
         pickle.dump(self.data, f)

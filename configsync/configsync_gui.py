@@ -4,16 +4,15 @@
 """
 Author:         Martin Simon
 Email:          martiin.siimon@gmail.com
-Git:            https://github.com/martiinsiimon/gitsync
+Git:            https://github.com/martiinsiimon/configsync
 License:        See bellow
-Project info:   GitSync is an easy tool to maintain small files synchronization
-                over remote git repository. It's not supposed to synchronize
-                big files. To such files use services as DropBox or SpiderOak.
-                The main purpose is to synchronize config files among very
-                similar systems to keep them sycnhronized and as much same
-                as possible.
+Project info:   ConfigSync is a tool with purpose to easy synchronize system config files
+                over remote storage - git. It uses git repository because of its
+                availability and easy way how to track file changes and origins. The main
+                purpose is to synchronize config files among very similar systems to keep
+                them sycnhronized and as much same as possible.
 File info:      This file describes the graphical interface and all the signal
-                bindings connected to that. This is not executable file!
+                bindings connected to that.
 
 The MIT License (MIT)
 
@@ -38,16 +37,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from gi.repository import Gtk, GObject
-from gitsync_config import GitSyncConfig
-from gitsync_core import GitSyncCore
+from configsync_config import ConfigSyncConfig
+from configsync_core import ConfigSyncCore
 import os
 
-class GitSyncGui:
-    def __init__(self):
+class ConfigSyncGui:
+    def __init__(self, wizard = False):
         """
         Contructor
         """
-        self.gladefile = 'gitsync.ui'
+        self.gladefile = 'configsync.ui'
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(self.gladefile)
@@ -61,28 +60,32 @@ class GitSyncGui:
         self.statusBar = self.builder.get_object('statusBar')
         self.progressBar = self.builder.get_object('progressBar')
 
-        self.config = GitSyncConfig()
-        self.core = GitSyncCore(self.config)
+        self.config = ConfigSyncConfig()
+        self.core = ConfigSyncCore(self.config)
 
         if not self.config.data.synced:
             """Not yet initialized"""
             self.show_wizard()
         else:
+            self.core.gitPull()
             self.show_main_window()
 
     def show_main_window(self):
+        """
+        Initialize GUI fields and lists and show the whole window.
+        """
         self.initFields()
 
         cell = Gtk.CellRendererText()
         if len(self.filesTreeview.get_columns()) == 0:
             column1 = Gtk.TreeViewColumn("Remote file", cell, text=0)
-            column1.set_clickable(True)   
+            column1.set_clickable(True)
             column1.set_resizable(True)
             column2 = Gtk.TreeViewColumn("Synchronized with", cell, text=1)
-            column2.set_clickable(True)   
+            column2.set_clickable(True)
             column2.set_resizable(True)
             column3 = Gtk.TreeViewColumn("Origin", cell, text=2)
-            column3.set_clickable(True)   
+            column3.set_clickable(True)
             column3.set_resizable(True)
             self.filesTreeview.append_column(column1)
             self.filesTreeview.append_column(column2)
@@ -92,13 +95,21 @@ class GitSyncGui:
         self.window.show()
 
     def show_wizard(self):
+        """
+        Show wizard at the first page
+        """
         ntb = self.builder.get_object('wizardNotebook')
         ntb.set_current_page(0)
         home = os.path.expanduser("~")
-        self.builder.get_object("directoryEntry").set_text(home + "/.gitsync")
+        self.builder.get_object("directoryEntry").set_text(home + "/.configsync")
         self.wizard.show()
 
     def on_wizard_confirm_clicked(self, object, data=None):
+        """
+        Function called when the wizard is finished. Entered values are checked here and
+        warning is shown if any error occurs. If everything passed, the wizard is hidden
+        and the main window is shown.
+        """
         directory = self.builder.get_object('directorySummary').get_text()
         repository = self.builder.get_object('repoSummary').get_text()
         valid = True # set to False if any check fails
@@ -129,31 +140,56 @@ class GitSyncGui:
         self.show_main_window()
 
     def on_wizard_next_clicked(self, object, data=None):
+        """
+        Handle wizard's 'next button'
+        """
         ntb = self.builder.get_object('wizardNotebook')
         ntb.next_page()
 
     def on_wizardNotebook_switch_page(self, object, data=None, tab=None):
+        """
+        Watch the wizard page number and if the number is 4 (the last page - summary),
+        call the refresh function to refresh fields in the summary.
+        """
         if tab == 4:
             self.refresh_summary_forms()
 
     def refresh_summary_forms(self):
-        print('DBG: Refresh summary forms')
+        """
+        Refresh values in wizard's summary page.
+        """
+        #print('DBG: Refresh summary forms')
         self.builder.get_object('nameSummary').set_text(self.builder.get_object('nameEntry').get_text())
         self.builder.get_object('directorySummary').set_text(self.builder.get_object('directoryEntry').get_text())
         self.builder.get_object('repoSummary').set_text(self.builder.get_object('repoEntry').get_text())
 
     def on_wizard_back_clicked(self, object, data=None):
+        """
+        Handle wizard's 'back button'
+        """
         ntb = self.builder.get_object('wizardNotebook')
         ntb.prev_page()
 
     def on_wizard_cancel_clicked(self, object, data=None):
+        """
+        Handle wizard 'cancel button'
+        """
         Gtk.main_quit()
 
     def on_mainWindow_delete(self, object, data=None):
+        """
+        Handle mainWindow delete widget event
+        """
+        self.core.synchronize()
         Gtk.main_quit()
 
     def on_addFileButton_clicked(self, object, data=None):
-        print("addFileButton clicked")
+        """
+        Handle event by button 'Add file'. It shows 'choose file' dialog, checks if
+        selected file is correct and if so, adds it to the remote repo and stores the
+        configurations as well as the file list. At the end the dialog is hidden.
+        """
+        #print("DBG: addFileButton clicked")
 
         dialog = self.builder.get_object('fileChooseDialog')
         response = dialog.run()
@@ -171,30 +207,37 @@ class GitSyncGui:
             self.core.linkFile(f, s)
             self.config.storeFileList()
             self.config.storeConfiguration()
-            #TODO Git add na file list
-            self.core.gitAdd(f)
 
-            #TODO git commit and git push?
+            self.core.gitAdd(s)
+            self.core.gitAddFilelist()
+            self.core.gitCommit()
 
             self.updateFileList()
         dialog.hide()
 
     def on_removeFileButton_clicked(self, object, data=None):
-        print("DBG: removeFileButton clicked")
+        """
+        Handle event by button 'Unlink file'. It shows the question dialog asking the user
+        if he is sure and if so, the file is unlinked from the tracking. If no other
+        machine is tracking the file any more, it's also removed from the remote repo.
+        Before the actual deleting are two actions states - to select any file and to
+        have the file linked. If these two states are not met, warning is shown.
+        """
+        #print("DBG: removeFileButton clicked")
         model, treeiter = self.filesTreeview.get_selection().get_selected()
         if treeiter == None:
             self.notifyStrong('You haven\'t selected any file to remove!')
             return
-        
+
         f = model[treeiter][0]
         s = model[treeiter][1]
-        
+
         if not self.config.data.existsFile(f):
             self.notifyStrong('The selected file is not synced!')
             return
 
         dialog = self.builder.get_object('questionRemoveFileDialog')
-        
+
         self.builder.get_object('fileLabel').set_text(f)
         response = dialog.run()
 
@@ -203,17 +246,23 @@ class GitSyncGui:
             syncedFile = self.config.data.path + "/" + os.path.basename(f)
             self.core.unlinkFile(syncedFile)
             if self.config.files.delFileLink(f):
-                self.core.gitRemove(f)
+                self.core.gitRemove(syncedFile)
                 self.config.files.delFile(f)
-            self.config.storeConfiguration()
+
             self.config.storeFileList()
+            self.core.gitAddFilelist()
+            self.core.gitCommit()
+            self.config.storeConfiguration()
 
             self.updateFileList()
 
         dialog.hide()
 
     def on_linkFileButton_clicked(self, object, data=None):
-        print("DBG: linkFileButton clicked")
+        """
+        Handle event by button 'Link file'.
+        """
+        #print("DBG: linkFileButton clicked")
         model, treeiter = self.filesTreeview.get_selection().get_selected()
         if treeiter == None:
             self.notifyStrong('You haven\'t selected any file to link!')
@@ -227,21 +276,22 @@ class GitSyncGui:
             self.config.data.addFile(f,s)
             self.core.linkFile(f, s)
             self.config.files.addFileLink(f)
+            self.config.storeFileList()
+            self.core.gitAddFilelist()
+            self.core.gitCommit()
 
             self.config.storeConfiguration()
-            self.config.storeFileList()
 
             self.updateFileList()
 
         dialog.hide()
 
     def on_syncButton_clicked(self, object, data=None):
-        print("DBG: syncButton clicked")
+        #print("DBG: syncButton clicked")
         self.core.synchronize()
-        #TODO handle the progress bar
 
     def on_resetButton_clicked(self, object, data=None):
-        print("DBG: resetButton clicked")
+        #print("DBG: resetButton clicked")
         self.config.data.synced = False
         self.config.data.files.clear()
         self.window.hide()
@@ -265,7 +315,6 @@ class GitSyncGui:
             for f in lst:
                 l = "Not linked"
                 o = self.config.files.files[f][0]
-                print("\tFile: ",f,", Linked: ",l,", Origin",o)
                 if self.config.data.existsFile(f):
                     l = self.config.data.getValue(f)
                 self.filesListstore.append([f,l,o])
