@@ -17,7 +17,7 @@ import sys, os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../'))
 
 # -- General configuration -----------------------------------------------------
 
@@ -49,7 +49,7 @@ copyright = '2013, Martin Simon'
 # built documents.
 #
 # The short X.Y version.
-version = ''
+version = '0.9'
 # The full version, including alpha/beta/rc tags.
 release = ''
 
@@ -104,7 +104,7 @@ html_theme = 'default'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-#html_title = None
+html_title = "ConfigSync - synchronize config files among different systems"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
@@ -165,7 +165,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'syncdoc'
+htmlhelp_basename = 'configsyncdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -184,8 +184,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'configsync.tex', 'configsync Documentation',
-   'Author', 'manual'),
+  ('index', 'configsync.tex', 'ConfigSync Documentation',
+   'Martin Simon', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -214,8 +214,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'configsync', 'configsync Documentation',
-     ['Author'], 1)
+    ('index', 'ConfigSync', 'ConfigSync Documentation',
+     ['Martin Simon'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -228,7 +228,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'configsync', 'ConfigSync Documentation',
+  ('index', 'ConfigSync', 'ConfigSync Documentation',
    'Martin Simon', 'configsync', 'ConfigSync is a tool with purpose to easy synchronize system config files over remote storage - git.',
    'Synchornization'),
 ]

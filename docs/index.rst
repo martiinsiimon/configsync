@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ConfigSync's documentation!
-===================================
+ConfigSync - synchronize config files among different systems
+=============================================================
 
 Contents:
 
@@ -24,3 +24,33 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+configsync Package
+==================
+
+:mod: `configsync` Module
+-------------------------
+
+.. automodule:: configsync.configsync
+    :members:
+    :undoc-members:
+
+:mod: `configsync_config` Module
+--------------------------------
+
+.. automodule:: configsync.configsync_config
+    :members:
+    :undoc-members:
+
+:mod: `configsync_core` Module
+------------------------------
+
+.. automodule:: configsync.configsync_core
+    :members:
+    :undoc-members:
+
+:mod: `configsync_gui` Module
+-----------------------------
+
+.. automodule:: configsync.configsync_gui
+    :members:
+    :undoc-members:
