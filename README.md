@@ -8,7 +8,10 @@ changes and origins.
 Martin Simon <martiin.siimon@gmail.com>
 
 ## Repository ##
-http://github.com/martiinsiimon/configsync
+Github: http://github.com/martiinsiimon/configsync
+
+## Documentation ##
+ReadTheDocs: http://configsync.readthedocs.org
 
 ## License ##
 This software is licensed under MIT license.
