@@ -27,30 +27,39 @@ Indices and tables
 configsync Package
 ==================
 
-:mod: `configsync` Module
--------------------------
+:mod: `configsync.configsync` Module
+
+------------------------------------
 
 .. automodule:: configsync.configsync
     :members:
     :undoc-members:
 
-:mod: `configsync_config` Module
---------------------------------
+
+:mod: `configsync.configsync_config` Module
+
+-------------------------------------------
 
 .. automodule:: configsync.configsync_config
     :members:
     :undoc-members:
 
-:mod: `configsync_core` Module
-------------------------------
+
+:mod: `configsync.configsync_core` Module
+
+-----------------------------------------
 
 .. automodule:: configsync.configsync_core
     :members:
     :undoc-members:
 
-:mod: `configsync_gui` Module
------------------------------
+
+:mod: `configsync.configsync_gui` Module
+
+----------------------------------------
 
 .. automodule:: configsync.configsync_gui
     :members:
     :undoc-members:
+
+

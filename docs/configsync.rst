@@ -1,7 +1,7 @@
-configsync Module
-=================
+configsync.configsync Module
+============================
 
-.. automodule:: configsync
+.. automodule:: configsync.configsync
     :members:
     :undoc-members:
     :show-inheritance:
