@@ -1,42 +1,34 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 #-*- coding: UTF-8 -*-
 
+# Copyright (c) 2013 Martin Simon
+#
+# The MIT License (MIT)
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 """
-Author:         Martin Simon
-Email:          martiin.siimon@gmail.com
-Git:            https://github.com/martiinsiimon/configsync
-License:        See bellow
-Project info:   ConfigSync is a tool with purpose to easy synchronize system config files
-                over remote storage - git. It uses git repository because of its
-                availability and easy way how to track file changes and origins. The main
-                purpose is to synchronize config files among very similar systems to keep
-                them sycnhronized and as much same as possible.
-File info:      This file contains the core of ConfigSync synchronization. It
-                contains all the real functionality.
-
-The MIT License (MIT)
-
-Copyright (c) 2013 Martin Simon
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Module contains the core of ConfigSync synchronization. It contains all the real
+functionality of git control and file manipulation. Take a look into implemented methods
+to get more perspective.
 """
 
-from configsync_config import ConfigSyncConfig
+from configsync.configsync_config  import ConfigSyncConfig
 import os
 import subprocess
 import shutil
@@ -44,15 +36,28 @@ import time
 
 class ConfigSyncCore:
     """
-    ConfigSync synchronize core
+    ConfigSync synchronization core.
     """
-    def __init__(self, _config):
+    def __init__(self, _config = ConfigSyncConfig()):
+        """
+        Initialize class. The optional parameter can be instance of ConfigSyncConfig class
+        to synchronize core actions with actual configuration (and file list as it's
+        a part of configuration itself).
+        
+        :param _config: ConfigSyncConfig instance to synchronize core actions with configuration
+        :type _config: ConfigSyncConfig instance
+        """
         self.config = _config
-
 
     def createWorkingDirectory(self, _path):
         """
-        Creates working directory or returns False
+        Create git working directory. In this directory the ConfigSync synchronization git
+        instance is proceed.
+        
+        :param _path: Path to the working directory
+        :type _path: string
+        :return: True if working directory created successfully
+        :rtype: bool
         """
         try:
             if os.path.isdir(_path):
@@ -64,120 +69,193 @@ class ConfigSyncCore:
 
     def gitClone(self, _repo, _path):
         """
-        Clone given repo into the directory
+        Clone given repository into the given working directory. This method is proceed
+        only once after configuration of ConfigSync is set.
+        
+        TODO: The command output should be checked. An error or password or encryption
+        information could be required. The check should be added.
+        
+        TODO: The address should be parsed and checked if this is correct git address.
+        
+        FIXME: The executed command should use native module instead of calling system
+        dependent program.
+        
+        :param _repo: Link to the git repository
+        :type _repo: string
+        :param _path: Path to the working directory
+        :type _path: string
+        :return: True if clone command passed without any error
+        :rtype: bool
         """
-        cmd = ['git', 'clone', _repo, _path] #FIXME substitute with python native call and parse output
+        cmd = ['git', 'clone', _repo, _path]
         p = subprocess.Popen(cmd)
         p.wait()
-        #TODO add git call and parse output
-        output = True #FIXME hack!
-        if output:
-            return True
-        else:
-            return False
+        return True
 
     def gitAddFilelist(self):
         """
-        Add a file list to local branch. Execute: git add
+        Add a file list to local branch. This is called after every file change.
+        
+        TODO: The command output should be checked. An error or password or encryption
+        information could be required. The check should be added.
+        
+        FIXME: The executed command should use native module instead of calling system
+        dependent program.
         """
         _path = self.config.data.path
         _file = self.config.filesFile
         print("DBG: 'git add",_file,"'")
-        cmd = ['git', 'add', _file] #FIXME substitute with python native call
+        cmd = ['git', 'add', _file]
         p = subprocess.Popen(cmd, cwd = _path)
         p.wait()
-        #FIXME the output should be parsed and checked for errors
 
-    def gitAdd(self,f):
+    def gitAdd(self, _file):
         """
-        Add a file to local branch. Execute: git add
+        Add given file to local branch. This is called after every file change.
+        
+        TODO: The command output should be checked. An error or password or encryption
+        information could be required. The check should be added.
+        
+        FIXME: The executed command should use native module instead of calling system
+        dependent program.
+        
+        :param _file: File basename in working directory
+        :type _file: string
         """
-        print("DBG: 'git add",f,"'")
+        print("DBG: 'git add", _file, "'")
         _path = self.config.data.path
-        cmd = ['git', 'add', f] #FIXME substitute with python native call
+        cmd = ['git', 'add', _file]
         p = subprocess.Popen(cmd, cwd = _path)
         p.wait()
-        #FIXME the output should be parsed and checked for errors
 
-    def gitRemove(self,f):
+    def gitRemove(self, _file):
         """
-        Remove a file. Execute: git remove
+        Remove a file from local branch. This is called after every file remove.
+        
+        TODO: The command output should be checked. An error or password or encryption
+        information could be required. The check should be added.
+        
+        FIXME: The executed command should use native module instead of calling system
+        dependent program.
+        
+        :param _file: File basename in working directory
+        :type _file: string
         """
-        print("DBG: 'git rm",f,"'")
+        print("DBG: 'git rm", _file, "'")
         _path = self.config.data.path
-        cmd = ['git', 'rm', f] #FIXME substitute with python native call
+        cmd = ['git', 'rm', _file]
         p = subprocess.Popen(cmd, cwd = _path)
         p.wait()
-        #FIXME the output should be parsed and checked for errors
 
     def gitPull(self):
         """
-        Git pull command
+        Git pull command.
+        
+        TODO: The command output should be checked. An error or password or encryption
+        information could be required. The check should be added.
+        
+        FIXME: The command execution is quite time consuming. It should be done on
+        background.
+        
+        FIXME: The executed command should use native module instead of calling system
+        dependent program.
         """
-        #TODO do the synchronization on background
         print("DBG: 'git pull'")
         _path = self.config.data.path
-        cmd = ['git', 'pull'] #FIXME substitute with python native call
+        cmd = ['git', 'pull']
         p = subprocess.Popen(cmd, cwd = _path)
         p.wait()
-        #FIXME the output should be parsed and checked for errors
 
     def gitPush(self):
         """
-        Git push command
+        Git push command.
+        
+        TODO: The command output should be checked. An error or password or encryption
+        information could be required. The check should be added.
+        
+        FIXME: The command execution is quite time consuming. It should be done on
+        background.
+        
+        FIXME: The executed command should use native module instead of calling system
+        dependent program.
         """
-        #TODO do the synchronization on background
         print("DBG: 'git push -u origin master'")
         _path = self.config.data.path
-        cmd = ['git', 'push', '-u', 'origin', 'master'] #TODO is this correct?
+        cmd = ['git', 'push', '-u', 'origin', 'master']
         p = subprocess.Popen(cmd, cwd = _path)
         p.wait()
-        #FIXME the output should be parsed and checked for errors
 
     def gitCommit(self):
         """
-        Git commit command
+        Git commit command. The commit message contains machine name and time stamp.
+        
+        TODO: The command output should be checked. An error or password or encryption
+        information could be required. The check should be added.
+        
+        FIXME: The command execution is quite time consuming. It should be done on
+        background.
+        
+        FIXME: The executed command should use native module instead of calling system
+        dependent program.
         """
         _path = self.config.data.path
-        _msg = "\"" + self.config.data.name + time.strftime("%Y-%m-%d(%H:%M:%S)") + "\""
+        _msg = "\"" + self.config.data.name + "-" + time.strftime("%Y-%m-%d(%H:%M:%S)") + "\""
         print("DBG: 'git commit -m", _msg,"'")
         cmd = ['git', 'commit', '-m', _msg]
-        p = subprocess.Popen(cmd, cwd = _path) #FIXME substitute with python native call
+        p = subprocess.Popen(cmd, cwd = _path)
         p.wait()
-        #FIXME the output should be parsed and checked for errors
 
-    def linkFile(self, f, s):
+    def linkFile(self, _f, _s):
         """
-        Make a hardlink to the file to synchronize to configsync working
-        directory to begin synchronization
+        Make a hardlink to the file to synchronize to ConfigSync working
+        directory to begin file tracking.
+        
+        FIXME: The executed command should use native module instead of calling system
+        dependent program.
+        
+        :param _f: Path to the original file what should be synchronized
+        :type _f: string
+        :param _s: Path to the file in ConfigSync working directory
+        :type _s: string
         """
-        print("DBG: 'ln -f", f, s,"'")
-        cmd = ['ln', '-f', f, s] #FIXME substitute with python native call
+        print("DBG: 'ln -f", _f, _s,"'")
+        cmd = ['ln', '-f', _f, _s]
         p = subprocess.Popen(cmd)
         p.wait()
 
-    def unlinkFile(self, remoteFile):
+    def unlinkFile(self, _file):
         """
-        Split a hardlink connection between two files to make them independent
+        Split a hardlink connection between two files to make them independent. This
+        method is called when file should not be synchronized any longer.
+        
+        FIXME: The executed command should use native module instead of calling system
+        dependent program.
+        
+        :param _file: Path to the file in ConfigSync working directory
+        :type _file: string
         """
         print("DBG: unlink file")
-        #target = self.config.data.path +"/"+ os.path.basename(f)
-        cmd = ['mv', remoteFile, "/tmp/tmpname"] #FIXME substitute with python native call
+        cmd = ['mv', _file, "/tmp/tmpname"]
         p = subprocess.Popen(cmd)
         p.wait()
 
-        cmd = ['cp', '/tmp/tmpname', remoteFile] #FIXME substitute with python native call
+        cmd = ['cp', '/tmp/tmpname', _file]
         p = subprocess.Popen(cmd)
         p.wait()
 
-        cmd = ['rm', '/tmp/tmpname'] #FIXME substitute with python native call
+        cmd = ['rm', '/tmp/tmpname']
         p = subprocess.Popen(cmd)
         p.wait()
 
     def synchronize(self):
         """
         Do the synchronization itself.
+        
+        TODO: The command output should be checked. An error or password or encryption
+        information could be required. The check should be added.
+        
+        FIXME: The command execution is quite time consuming. It should be done on
+        background.
         """
-        #TODO do the synchronization on background
         self.gitCommit()
         self.gitPush()

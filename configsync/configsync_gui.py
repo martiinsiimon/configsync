@@ -1,55 +1,49 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 #-*- coding: UTF-8 -*-
 
+# Copyright (c) 2013 Martin Simon
+#
+# The MIT License (MIT)
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 """
-Author:         Martin Simon
-Email:          martiin.siimon@gmail.com
-Git:            https://github.com/martiinsiimon/configsync
-License:        See bellow
-Project info:   ConfigSync is a tool with purpose to easy synchronize system config files
-                over remote storage - git. It uses git repository because of its
-                availability and easy way how to track file changes and origins. The main
-                purpose is to synchronize config files among very similar systems to keep
-                them sycnhronized and as much same as possible.
-File info:      This file describes the graphical interface and all the signal
-                bindings connected to that.
-
-The MIT License (MIT)
-
-Copyright (c) 2013 Martin Simon
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Module describes the graphical interface and all the signal bindings connected to that.
 """
 
+from configsync.configsync_config import ConfigSyncConfig
+from configsync.configsync_core import ConfigSyncCore
+from pkg_resources import Requirement, resource_filename
 from gi.repository import Gtk, GObject
-from configsync_config import ConfigSyncConfig
-from configsync_core import ConfigSyncCore
 import os
 
 class ConfigSyncGui:
     def __init__(self, wizard = False):
         """
-        Contructor
+        Constructor of ConfigSyncGui class object
+        
+        :param wizard: If True, force to start wizard first. Otherwise, the wizard is started only if the configuration is not set.
+        :type wizard: bool
         """
-        self.gladefile = 'configsync.ui'
+        self.guifile = resource_filename(Requirement.parse("configsync"),"configsync/configsync.ui")
 
         self.builder = Gtk.Builder()
-        self.builder.add_from_file(self.gladefile)
+        self.builder.add_from_file(self.guifile)
         self.builder.connect_signals(self)
         self.window = self.builder.get_object('mainWindow')
         self.wizard = self.builder.get_object('wizardWindow')
@@ -63,8 +57,8 @@ class ConfigSyncGui:
         self.config = ConfigSyncConfig()
         self.core = ConfigSyncCore(self.config)
 
-        if not self.config.data.synced:
-            """Not yet initialized"""
+        if not self.config.data.synced or wizard:
+            """Not yet initialized or wizard choosed"""
             self.show_wizard()
         else:
             self.core.gitPull()
@@ -94,14 +88,17 @@ class ConfigSyncGui:
 
         self.window.show()
 
-    def show_wizard(self):
+    def show_wizard(self, page = 0):
         """
         Show wizard at the first page
+        
+        :param page: The current page of the wizard
+        :type page: int
         """
         ntb = self.builder.get_object('wizardNotebook')
-        ntb.set_current_page(0)
+        ntb.set_current_page(page)
         home = os.path.expanduser("~")
-        self.builder.get_object("directoryEntry").set_text(home + "/.configsync")
+        self.builder.get_object("directoryEntry").set_text(home + "/.configsync/syncdir/")
         self.wizard.show()
 
     def on_wizard_confirm_clicked(self, object, data=None):
@@ -112,29 +109,27 @@ class ConfigSyncGui:
         """
         directory = self.builder.get_object('directorySummary').get_text()
         repository = self.builder.get_object('repoSummary').get_text()
-        valid = True # set to False if any check fails
-        #TODO check if the given address is address to repo
-        #TODO check if user have correct permissions to the repo
 
-        if valid and not self.core.createWorkingDirectory(directory):
-            print('DBG: Unable to create working directory!')
+        if not self.core.createWorkingDirectory(directory):
+            print('Unable to create working directory! Is the path correct?')
             #TODO add visible warning and return to the appropriate wizard page
+            self.wizard.hide()
+            self.show_wizard(2)
+            return
 
-        if valid and not self.core.gitClone(repository, directory):
-            print('DBG: Unable to clone repository!')
+        if not self.core.gitClone(repository, directory):
+            print('Unable to clone repository!')
             #TODO add visible warning and possible more options (key, password, etc.)
+            self.wizard.hide()
+            self.show_wizard(3)
+            return
 
-        if valid:
-            self.config.data.name = self.builder.get_object('nameSummary').get_text()
-            self.config.data.repo = repository
-            self.config.data.path = directory
-            self.config.storeConfiguration()
+        self.config.data.name = self.builder.get_object('nameSummary').get_text()
+        self.config.data.repo = repository
+        self.config.data.path = directory
+        self.config.storeConfiguration()
 
-            self.config.restoreFileList()
-
-        else:
-            print('DBG: Any error occured before, configuration hasn\'t been stored')
-            #TODO add visible warning
+        self.config.restoreFileList()
 
         self.wizard.hide()
         self.show_main_window()
@@ -158,7 +153,6 @@ class ConfigSyncGui:
         """
         Refresh values in wizard's summary page.
         """
-        #print('DBG: Refresh summary forms')
         self.builder.get_object('nameSummary').set_text(self.builder.get_object('nameEntry').get_text())
         self.builder.get_object('directorySummary').set_text(self.builder.get_object('directoryEntry').get_text())
         self.builder.get_object('repoSummary').set_text(self.builder.get_object('repoEntry').get_text())
@@ -189,8 +183,6 @@ class ConfigSyncGui:
         selected file is correct and if so, adds it to the remote repo and stores the
         configurations as well as the file list. At the end the dialog is hidden.
         """
-        #print("DBG: addFileButton clicked")
-
         dialog = self.builder.get_object('fileChooseDialog')
         response = dialog.run()
         big = False
@@ -223,7 +215,6 @@ class ConfigSyncGui:
         Before the actual deleting are two actions states - to select any file and to
         have the file linked. If these two states are not met, warning is shown.
         """
-        #print("DBG: removeFileButton clicked")
         model, treeiter = self.filesTreeview.get_selection().get_selected()
         if treeiter == None:
             self.notifyStrong('You haven\'t selected any file to remove!')
@@ -262,7 +253,6 @@ class ConfigSyncGui:
         """
         Handle event by button 'Link file'.
         """
-        #print("DBG: linkFileButton clicked")
         model, treeiter = self.filesTreeview.get_selection().get_selected()
         if treeiter == None:
             self.notifyStrong('You haven\'t selected any file to link!')
@@ -287,11 +277,15 @@ class ConfigSyncGui:
         dialog.hide()
 
     def on_syncButton_clicked(self, object, data=None):
-        #print("DBG: syncButton clicked")
+        """
+        Evoke synchronization immediately. It connected to 'Synchronize now' button.
+        """
         self.core.synchronize()
 
     def on_resetButton_clicked(self, object, data=None):
-        #print("DBG: resetButton clicked")
+        """
+        Invalidate the configuration status and show the wizard to apply new configuration.
+        """
         self.config.data.synced = False
         self.config.data.files.clear()
         self.window.hide()
@@ -308,6 +302,10 @@ class ConfigSyncGui:
         self.updateFileList()
 
     def updateFileList(self):
+        """
+        Fill the fileList in the GUI widget with file entries if there're any. Also check
+        if the shown entries are actually linked with something locally.
+        """
         self.filesListstore = Gtk.ListStore(str,str,str)
         self.filesListstore.clear()
         if len(self.config.files.files) > 0:
@@ -322,13 +320,27 @@ class ConfigSyncGui:
         self.filesTreeview.set_model(self.filesListstore)
         self.filesTreeview.expand_all()
 
-    def checkFileSize(self,f):
+    def checkFileSize(self, f):
+        """
+        Simple function to check file size. Maximal valid file size is 1MB.
+        
+        :param f: Name of the file (path)
+        :type f: string
+        :return: True if the file is bigger than the limit
+        :rtype: bool
+        """
         if os.path.getsize(f) > 1048576: # 1MB is the limit
             return False
         else:
             return True
 
     def notifyStrong(self, text):
+        """
+        Evoke warning popup dialog with custom text.
+        
+        :param text: The cumstom text of a warning
+        :type text: string
+        """
         dialog = self.builder.get_object('notifyStrongDialog')
         self.builder.get_object('notifyStrongLabel').set_text(text)
         dialog.run()
@@ -336,5 +348,11 @@ class ConfigSyncGui:
 
 
     def notifyWeak(self, text):
+        """
+        Flush a custom warning text into status bar.
+        
+        :param text: The cumstom text of a warning
+        :type text: string
+        """
         msgId = self.statusBar.push(1, text)
         GObject.timeout_add(4000, self.statusBar.remove,1,msgId)
