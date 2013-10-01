@@ -17,8 +17,9 @@ config = {
     },
     
     'package_data' : {'':['*.ui']},
+    'requires': ['PyGObject'],
     'install_requires': ['PyGObject'],
-    
+
     # used for PyPI
     'author': 'Martin Simon',
     'author_email': 'martiinsiimon@gmail.com',
